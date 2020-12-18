@@ -1,3 +1,4 @@
+import itertools
 import random as rand
 import numpy as np
 
@@ -9,6 +10,8 @@ combinations = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
 
 # AND
 d_response = [-1, -1, -1, 1]
+
+
 # XOR
 # d_response = [-1, 1, 1, -1]
 
@@ -77,4 +80,89 @@ def first_guess(values, w0, w1, w2):
         return -1
 
 
-first()
+def ten_guesses(values, weights_list):
+    value = 0
+    w0 = weights_list[0]
+    value += w0
+
+    for x in range(len(weights_list) - 1):
+        value += (values[x] * weights_list[x])
+
+    return value
+
+
+def make_list_combinations():
+    combinations_10_all = list(map(list, itertools.product([0, 1], repeat=3)))
+    combinations_10_mid = list()
+
+    for x in range(10):
+        add = rand.choice(combinations_10_all)
+        combinations_10_mid.append(add)
+
+    return combinations_10_mid
+
+
+def make_list_resposnse():
+    d_response_10 = list()
+    for x in range(10):
+        k = rand.randint(0, 1)
+
+        if k == 0:
+            d_response_10.append(-1)
+        else:
+            d_response_10.append(k)
+
+    print(d_response_10)
+    return d_response_10
+
+
+def ten_inputs():
+    weights_list = []
+    list_inputs = make_list_combinations()
+    list_response = make_list_resposnse()
+    all_epoch = 0
+    values_epoch = []
+
+    for x in range(4):
+        w = rand.random() / 100
+        weights_list.append(w)
+
+    for t in range(30):
+        alpha = 0.00000001
+        values_delta = np.zeros(len(weights_list), dtype=int)
+        stop = None
+        number_epoch = 0
+
+        while stop is None:
+            errors_0 = []
+
+            for tt in range(len(list_inputs)):
+                values = list_inputs[tt]
+                expected_result = list_response[tt]
+
+                real_result = ten_guesses(values, weights_list)
+
+                error = expected_result - real_result
+                if error == 0:
+                    print("FOUND ONE")
+                    errors_0.append(error)
+
+                values_delta[0] += alpha * error
+                for xx in range(len(weights_list) - 1):
+                    values_delta[xx] += alpha * values[xx] * error
+
+            weights_list = values_delta
+            number_epoch += 1
+            if len(errors_0) == len(list_inputs):
+                print("STOP!!!")
+                stop = "STOP!"
+
+        all_epoch += number_epoch
+        values_epoch.append(number_epoch)
+    average_epoch = all_epoch / 30
+    print("MEDIA DE EPOCH:   " + str(average_epoch))
+    deviation = np.std(values_epoch)
+    print("DESVIO PADRÃO:  " + str(deviation))
+
+
+ten_inputs()
