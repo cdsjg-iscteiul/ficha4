@@ -85,17 +85,17 @@ def ten_guesses(values, weights_list):
     w0 = weights_list[0]
     value += w0
 
-    for x in range(len(weights_list) - 1):
-        value += (values[x] * weights_list[x])
+    for x in range(len(values)):
+        value += (values[x] * weights_list[x + 1])
 
     return value
 
 
 def make_list_combinations():
-    combinations_10_all = list(map(list, itertools.product([0, 1], repeat=3)))
+    combinations_10_all = list(map(list, itertools.product([0, 1], repeat=2)))
     combinations_10_mid = list()
 
-    for x in range(10):
+    for x in range(4):
         add = rand.choice(combinations_10_all)
         combinations_10_mid.append(add)
 
@@ -104,7 +104,7 @@ def make_list_combinations():
 
 def make_list_resposnse():
     d_response_10 = list()
-    for x in range(10):
+    for x in range(4):
         k = rand.randint(0, 1)
 
         if k == 0:
@@ -112,7 +112,6 @@ def make_list_resposnse():
         else:
             d_response_10.append(k)
 
-    print(d_response_10)
     return d_response_10
 
 
@@ -123,35 +122,38 @@ def ten_inputs():
     all_epoch = 0
     values_epoch = []
 
-    for x in range(4):
-        w = rand.random() / 100
+    for x in range(3):
+        w = rand.random() / 10
         weights_list.append(w)
-
     for t in range(30):
-        alpha = 0.00000001
-        values_delta = np.zeros(len(weights_list), dtype=int)
+        alpha = 0.1
+        values_delta = np.zeros(len(weights_list))
         stop = None
         number_epoch = 0
 
         while stop is None:
             errors_0 = []
+            errors = []
 
-            for tt in range(len(list_inputs)):
+            for tt in range(len(list_inputs) - 1):
                 values = list_inputs[tt]
                 expected_result = list_response[tt]
 
                 real_result = ten_guesses(values, weights_list)
 
                 error = expected_result - real_result
+                errors.append(error)
                 if error == 0:
                     print("FOUND ONE")
                     errors_0.append(error)
 
                 values_delta[0] += alpha * error
-                for xx in range(len(weights_list) - 1):
-                    values_delta[xx] += alpha * values[xx] * error
-
-            weights_list = values_delta
+                for xx in range(len(values)):
+                    delta_change = alpha * values[xx] * error
+                    values_delta[xx + 1] += delta_change
+            print(errors)
+            for tt in range(len(weights_list)):
+                weights_list[tt] += values_delta[tt]
             number_epoch += 1
             if len(errors_0) == len(list_inputs):
                 print("STOP!!!")
