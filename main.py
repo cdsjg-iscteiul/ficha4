@@ -1,6 +1,7 @@
 import itertools
 import random as rand
-import time
+import \
+    matplotlib.pyplot as plt
 
 import numpy as np
 
@@ -25,7 +26,7 @@ def first():
     all_epoch = 0
     values_epoch = []
     for y in range(30):
-        alpha = 0.001
+        alpha = 0.89
         delta_w0 = 0
         delta_w1 = 0
         delta_w2 = 0
@@ -52,13 +53,11 @@ def first():
                 delta_w0 += alpha * error
                 delta_w1 += alpha * x_1 * error
                 delta_w2 += alpha * x_2 * error
-            print("EPOCH DONE")
             w0 = delta_w0
             w1 = delta_w1
             w2 = delta_w2
             number_epoch += 1
             if len(errors_0) == 4:
-                print("STOP!!!")
                 stop = "STOP!"
         print("NUMBER OF EPOCH:  " + str(number_epoch))
         all_epoch += number_epoch
@@ -67,6 +66,9 @@ def first():
     print("MEDIA DE EPOCH:   " + str(average_epoch))
     deviation = np.std(values_epoch)
     print("DESVIO PADRÃO:  " + str(deviation))
+
+    plt.hist(values_epoch)
+    plt.show()
 
 
 def first_guess(values, w0, w1, w2):
@@ -100,7 +102,7 @@ def make_list_combinations():
     combinations_10_all = list(map(list, itertools.product([0, 1], repeat=10)))
     combinations_10_mid = list()
 
-    for x in range(100):
+    for x in range(10):
         add = rand.choice(combinations_10_all)
         combinations_10_mid.append(add)
 
@@ -109,7 +111,7 @@ def make_list_combinations():
 
 def make_list_resposnse():
     d_response_10 = list()
-    for x in range(100):
+    for x in range(10):
         k = rand.randint(0, 1)
 
         if k == 0:
@@ -131,7 +133,7 @@ def ten_inputs():
         w = rand.random() / 10
         weights_list.append(w)
 
-    for t in range(30):
+    for t in range(5):
         alpha = 0.001
         values_delta = np.zeros(len(weights_list))
         stop = None
@@ -160,7 +162,6 @@ def ten_inputs():
 
             number_epoch += 1
             if len(errors_0) == len(list_inputs):
-                print("STOP!!!")
                 stop = "STOP!"
 
         all_epoch += number_epoch
@@ -169,6 +170,7 @@ def ten_inputs():
     print("MEDIA DE EPOCH:   " + str(average_epoch))
     deviation = np.std(values_epoch)
     print("DESVIO PADRÃO:  " + str(deviation))
-
+    plt.hist(values_epoch)
+    plt.show()
 
 ten_inputs()
